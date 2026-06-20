@@ -27,7 +27,32 @@ def preprocess_data(df):
     return df_clean
 
 if __name__ == "__main__":
-    from load_data import load_raw_data
-    raw_df = load_raw_data()
-    if raw_df is not None:
-        clean_df = preprocess_data(raw_df)
+    import sys
+    import os
+    import pandas as pd
+
+    input_path = os.path.abspath("raw_data.csv")
+    output_path = os.path.abspath("cleaned_data.csv")
+
+    # Process Helpers: Ingestion :
+    if not os.path.exists(input_path):
+        print(f"Fatal error: Input payload not found at {input_path}")
+        sys.exit(1)
+
+    try:
+        raw_df = pd.read_csv(input_path)
+    except Exception as e:
+        print(f"Fatal error: Failed to parse input payload: {e}")
+        sys.exit(1)
+
+    # Process Helpers: Transformation :
+    clean_df = preprocess_data(raw_df)
+
+    # Process Helpers: Serialization :
+    if clean_df is not None and not clean_df.empty:
+        clean_df.to_csv(output_path, index=False, encoding="utf-8-sig")
+        print(f"Preprocessing successful. Payload serialized to {output_path}")
+        sys.exit(0)
+
+    print("Preprocessing failed to generate valid payload. Aborting pipeline.")
+    sys.exit(1)

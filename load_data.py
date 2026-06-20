@@ -41,6 +41,18 @@ def load_raw_data():
         conn.close()
 
 if __name__ == "__main__":
+    import sys
+    import os
+
+    # Process Helpers: Extraction :
     df = load_raw_data()
-    if df is not None:
-        print(df.head())
+
+    # Process Helpers: Serialization :
+    if df is not None and not df.empty:
+        output_path = os.path.abspath("raw_data.csv")
+        df.to_csv(output_path, index=False, encoding="utf-8-sig")
+        print(f"Extraction successful. Payload serialized to {output_path}")
+        sys.exit(0)
+    
+    print("Extraction failed or dataset is empty. Aborting pipeline.")
+    sys.exit(1)
