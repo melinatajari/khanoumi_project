@@ -1,46 +1,53 @@
+import subprocess
 import os
-import pandas as pd
-from load_data import load_raw_data
-from preprocess import preprocess_data
-from feature_engineering import engineer_features
+import sys
+
+def run_script(script_name):
+    """Executes a python script as a separate process using subprocess."""
+    python_executable = sys.executable
+    result = subprocess.run([python_executable, script_name], capture_output=True, text=True)
+    
+    if result.returncode != 0:
+        print(f"[ERROR] Pipeline aborted: {script_name} failed during execution.")
+        print("Detailed Error Logs Below:")
+        print(result.stderr)
+        return False
+        
+    if result.stdout.strip():
+        print(result.stdout)
+    return True
 
 def run_end_to_end_pipeline():
-    """Orchestrate data ingestion, preprocessing, and feature engineering."""
+    """Orchestrate data ingestion, preprocessing, and feature engineering using subprocess."""
     print("=" * 60)
-    print("INITIATING END-TO-END DATA SCIENCE PIPELINE")
+    print("INITIATING SUBPROCESS-BASED DATA SCIENCE PIPELINE")
     print("=" * 60)
     
     try:
-        # Step 1: Data Ingestion
-        raw_data = load_raw_data()
-        if raw_data is None or raw_data.empty:
-            print("[ERROR] Pipeline aborted: Failed to load raw data.")
+        # Step 1: Execute Data Ingestion
+        print("Step 1: Running Data Ingestion...")
+        if not run_script("load_data.py"):
             return
             
-        # Step 2: Data Preprocessing & Cleaning
-        cleaned_data = preprocess_data(raw_data)
-        if cleaned_data is None:
-            print("[ERROR] Pipeline aborted: Preprocessing failed.")
+        # Step 2: Execute Data Preprocessing & Cleaning
+        print("Step 2: Running Data Preprocessing...")
+        if not run_script("preprocess.py"):
             return
             
-        # Step 3: Feature Engineering
-        final_dataset = engineer_features(cleaned_data)
-        if final_dataset is None:
-            print("[ERROR] Pipeline aborted: Feature engineering failed.")
+        # Step 3: Execute Feature Engineering & Data Export
+        print("Step 3: Running Feature Engineering & Data Export...")
+        if not run_script("feature_engineering.py"):
             return
             
-        # Step 4: Save fully processed dataset for ML tasks
-        output_filename = "processed_products.csv"
-        final_dataset.to_csv(output_filename, index=False, encoding='utf-8-sig')
-        
+        # اصلاح نام فایل خروجی متناسب با فایل اصلی کدهای هم‌گروهی شما
+        output_filename = "final_processed_data.csv"
         print("=" * 60)
-        print("PIPELINE EXECUTION SUCCESSFUL!")
-        print(f"-> Final dataset saved to: {os.path.abspath(output_filename)}")
-        print(f"-> Total shapes recorded: {final_dataset.shape}")
+        print("PIPELINE EXECUTION SUCCESSFUL VIA SUBPROCESS!")
+        print(f"-> Final dataset status validated: {os.path.abspath(output_filename)}")
         print("=" * 60)
         
     except Exception as e:
-        print(f"[FATAL ERROR] Pipeline failed during execution: {e}")
+        print(f"[FATAL ERROR] Pipeline failed during subprocess execution: {e}")
 
 if __name__ == "__main__":
     run_end_to_end_pipeline()
