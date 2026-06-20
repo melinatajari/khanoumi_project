@@ -2,8 +2,8 @@ import subprocess
 import os
 import sys
 
+# Execution Helpers: Process Invocation :
 def run_script(script_name):
-    """Executes a python script as a separate process using subprocess."""
     python_executable = sys.executable
     result = subprocess.run([python_executable, script_name], capture_output=True, text=True)
     
@@ -17,29 +17,26 @@ def run_script(script_name):
         print(result.stdout)
     return True
 
+# Execution Helpers: Pipeline Orchestration :
 def run_end_to_end_pipeline():
-    """Orchestrate data ingestion, preprocessing, and feature engineering using subprocess."""
     print("=" * 60)
     print("INITIATING SUBPROCESS-BASED DATA SCIENCE PIPELINE")
     print("=" * 60)
     
     try:
-        # Step 1: Execute Data Ingestion
         print("Step 1: Running Data Ingestion...")
         if not run_script("load_data.py"):
             return
             
-        # Step 2: Execute Data Preprocessing & Cleaning
         print("Step 2: Running Data Preprocessing...")
         if not run_script("preprocess.py"):
             return
             
-        # Step 3: Execute Feature Engineering & Data Export
         print("Step 3: Running Feature Engineering & Data Export...")
         if not run_script("feature_engineering.py"):
             return
             
-        output_filename = "final_processed_data.csv"
+        output_filename = "processed_products.csv"
         print("=" * 60)
         print("PIPELINE EXECUTION SUCCESSFUL VIA SUBPROCESS!")
         print(f"-> Final dataset status validated: {os.path.abspath(output_filename)}")

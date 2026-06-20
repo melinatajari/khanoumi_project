@@ -66,14 +66,32 @@ def engineer_features(df):
     return df_features
 
 if __name__ == "__main__":
-    raw_df = load_raw_data()
-    if raw_df is not None:
-        cleaned_df = preprocess_data(raw_df)
-        if cleaned_df is not None:
-            final_featured_df = engineer_features(cleaned_df)
-            
-            # Save the processed data as a CSV file to satisfy the last requirement
-            if final_featured_df is not None:
-                output_file = "final_processed_data.csv"
-                final_featured_df.to_csv(output_file, index=False, encoding='utf-8-sig')
-                print(f"Processed dataset successfully saved to: {output_file}")
+    import sys
+    import os
+    import pandas as pd
+
+    input_path = os.path.abspath("cleaned_data.csv")
+    output_path = os.path.abspath("processed_products.csv")
+
+    # Process Helpers: Initialization :
+    if not os.path.exists(input_path):
+        print(f"Fatal error: Input payload not found at {input_path}")
+        sys.exit(1)
+
+    try:
+        clean_df = pd.read_csv(input_path)
+    except Exception as e:
+        print(f"Fatal error: Failed to parse input payload: {e}")
+        sys.exit(1)
+
+    # Process Helpers: Transformation :
+    final_featured_df = engineer_features(clean_df)
+
+    # Process Helpers: Serialization :
+    if final_featured_df is not None and not final_featured_df.empty:
+        final_featured_df.to_csv(output_path, index=False, encoding="utf-8-sig")
+        print(f"Feature engineering successful. Payload serialized to {output_path}")
+        sys.exit(0)
+
+    print("Feature engineering failed to generate valid payload. Aborting pipeline.")
+    sys.exit(1)
