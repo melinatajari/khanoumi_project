@@ -39,7 +39,6 @@ def run_end_to_end_pipeline():
         if not run_script("feature_engineering.py"):
             return
             
-        # اصلاح نام فایل خروجی متناسب با فایل اصلی کدهای هم‌گروهی شما
         output_filename = "final_processed_data.csv"
         print("=" * 60)
         print("PIPELINE EXECUTION SUCCESSFUL VIA SUBPROCESS!")
